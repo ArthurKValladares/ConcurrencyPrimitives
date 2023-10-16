@@ -9,6 +9,10 @@
 
 #include "ThreadSafeQueue.h"
 
+#define REFERENCE_THREAD_POOL false
+
+#if !REFERENCE_THREAD_POOL
+
 struct ThreadJoiner
 {
     explicit ThreadJoiner(std::vector<std::thread>& threads) 
@@ -43,3 +47,18 @@ private:
     std::atomic_bool                       m_done;
     std::vector<std::future<void>>         m_futures;
 };
+
+#else
+
+#include "BS_thread_pool.hpp"
+
+struct ThreadPool {
+    ThreadPool();
+    
+    void Schedule(const std::function<void()>);
+    void Wait();
+private:
+    BS::thread_pool m_pool;
+};
+
+#endif

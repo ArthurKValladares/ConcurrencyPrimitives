@@ -1,6 +1,8 @@
 #include "ThreadPool.h"
-#include <memory>
 
+#if !REFERENCE_THREAD_POOL
+
+#include <memory>
 void ThreadPool::WorkerThread() {
     while (!m_done) {
         std::function<void()> task;
@@ -47,3 +49,17 @@ void ThreadPool::Wait() {
     }
     m_futures.clear();
 }
+
+#else
+
+ThreadPool::ThreadPool() {}
+
+void ThreadPool::Schedule(const std::function<void()> f) {
+    m_pool.push_task(f);
+}
+
+void ThreadPool::Wait() {
+    m_pool.wait_for_tasks();
+}
+
+#endif
