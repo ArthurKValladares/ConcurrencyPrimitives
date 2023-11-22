@@ -9,7 +9,19 @@
 
 #include "ThreadSafeQueue.h"
 
+#define NOOP_THREAD_POOL false
 #define REFERENCE_THREAD_POOL false
+
+#if NOOP_THREAD_POOL
+
+struct ThreadPool {
+    ThreadPool() {}
+
+    void Schedule(const std::function<void()>);
+    void Wait();
+};
+
+#else
 
 #if !REFERENCE_THREAD_POOL
 
@@ -53,12 +65,14 @@ private:
 #include "BS_thread_pool.hpp"
 
 struct ThreadPool {
-    ThreadPool();
+    ThreadPool() {}
     
     void Schedule(const std::function<void()>);
     void Wait();
 private:
     BS::thread_pool m_pool;
 };
+
+#endif
 
 #endif

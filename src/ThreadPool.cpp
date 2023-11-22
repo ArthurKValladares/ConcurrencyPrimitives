@@ -1,5 +1,15 @@
 #include "ThreadPool.h"
 
+#if NOOP_THREAD_POOL
+
+void ThreadPool::Schedule(const std::function<void()> f) {
+    f();
+}
+
+void ThreadPool::Wait() {}
+
+#else
+
 #if !REFERENCE_THREAD_POOL
 
 #include <memory>
@@ -52,8 +62,6 @@ void ThreadPool::Wait() {
 
 #else
 
-ThreadPool::ThreadPool() {}
-
 void ThreadPool::Schedule(const std::function<void()> f) {
     m_pool.push_task(f);
 }
@@ -61,5 +69,7 @@ void ThreadPool::Schedule(const std::function<void()> f) {
 void ThreadPool::Wait() {
     m_pool.wait_for_tasks();
 }
+
+#endif
 
 #endif
